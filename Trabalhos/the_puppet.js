@@ -1,12 +1,12 @@
 // Partes do corpo
 class Braco{
 
-	criaOmbro(x,y,z,cores){
+	criaOmbro(x,y,z,cor){
 		return new THREE.Mesh(new THREE.SphereGeometry(x,y,z), new THREE.MeshBasicMaterial({color: cor}));
 	}
 	
 	criaBraco(x,y,z,cor){
-		return new THREE.Mesh(new THREE.BoxGeometry(x,y,z), new THREE.MeshBasicMaterial({color: red}));
+		return new THREE.Mesh(new THREE.BoxGeometry(x,y,z), new THREE.MeshBasicMaterial({color: cor}));
 	}
 }
 
@@ -19,7 +19,7 @@ class Tronco{
 
 class Perna{
 	criaPerna(x,y,z,cor){
-		return new THREE.Mesh(new THREE.BoxGeometry(x,y,z), new THREE.MeshBasicMaterial({color: red}));
+		return new THREE.Mesh(new THREE.BoxGeometry(x,y,z), new THREE.MeshBasicMaterial({color: cor}));
 	}
 }
 
@@ -30,41 +30,40 @@ class Cabeca{
 }
 
 class Corpo {
-	constructor(
+	constructor(){
+		// Cores disponiveis
+		this.white = new THREE.Color(255,255,255);
+		this.red = new THREE.Color(1,0,0);
+		this.green = new THREE.Color(0,1,0);
+		this.blue = new THREE.Color(0,0,1);
+		// Conjunto de cores
+		this.materials = [
+			new THREE.MeshBasicMaterial({color: this.blue}),
+			new THREE.MeshBasicMaterial({color: this.blue}),
+			new THREE.MeshBasicMaterial({color: this.blue}),
+			new THREE.MeshBasicMaterial({color: this.blue}),
+			new THREE.MeshBasicMaterial({color: this.green}),
+			new THREE.MeshBasicMaterial({color: this.red})
+		],
+		
 		// Criação dos braços
-		bracoG = new Braco(),
+		this.bracoG = new Braco();
 
 		// Montando corpo
-		braco_direito = bracoG.criaBraco(1,4,1,red),
-		//braco_esquerdo = bracoG.criaBraco(),
-		ombro_direito = bracoG.criaOmbro(1,32,32,white),
-		tronco = new Tronco().criaTronco(4,7,2,this.materials),
-		cabeca = new Cabeca().criaCabeca(2,32,32,blue),
-		//perna_direita = new Perna().criaPerna(),
-		//perna_esquerda = new Perna().criaPerna(),
+		this.braco_direito = this.bracoG.criaBraco(1,4,1,this.red);
+		//braco_esquerdo = bracoG.criaBraco();
+		this.ombro_direito = this.bracoG.criaOmbro(1,32,32,this.white);
+		this.tronco = new Tronco().criaTronco(4,7,2,this.materials);
+		this.cabeca = new Cabeca().criaCabeca(2,32,32,this.blue);
+		//perna_direita = new Perna().criaPerna();
+		//perna_esquerda = new Perna().criaPerna();
 
 		// Pivos
-		p_ombro_direito = new THREE.Group(),
-	
-
-		// Cores disponiveis
-		white = new THREE.Color(0,0,0),
-		red = new THREE.Color(1,0,0),
-		green = new THREE.Color(0,1,0),
-		blue = 	new THREE.Color(0,0,1),
-		// Conjunto de cores
-		materials = [
-			new THREE.MeshBasicMaterial({color: blue}),
-			new THREE.MeshBasicMaterial({color: blue}),
-			new THREE.MeshBasicMaterial({color: blue}),
-			new THREE.MeshBasicMaterial({color: blue}),
-			new THREE.MeshBasicMaterial({color: green}),
-			new THREE.MeshBasicMaterial({color: red})
-		],
+		this.p_ombro_direito = new THREE.Group();
 
 		// Dicionario de partes do corpo
-		personagem = montar()
-	)
+		this.puppet = this.montar();
+	}
 
 	/*
 	@ name: Monta
@@ -72,7 +71,7 @@ class Corpo {
 	*/
 	montar(){
 		// Adiciona as partes do corpo ao dicionario
-		personagem = [];
+		let personagem = [];
 		
 		personagem["tronco"] = this.tronco;
 		personagem["cabeca"] = this.cabeca;
@@ -102,6 +101,8 @@ class Corpo {
 var scene;
 var camera;
 var renderer;
+// Instancia o nosso personagem
+const corpo = new Corpo();
 
 var init = function (){
 	scene = new THREE.Scene();
@@ -115,13 +116,9 @@ var init = function (){
 	camera.position.x = 0;
 	camera.position.y = 2;
 	
-	// Instancia o nosso personagem
-	var corpo = new Corpo();
-
 	// Carrega o corpo para ser renderizado
 	scene.add(corpo.tronco);
-
-	//animation();
+	animation();
 
 	// Eventos do teclado
 	document.addEventListener('keydown', apertouButao);
@@ -129,7 +126,7 @@ var init = function (){
 
 	// Eventos do mouse
 	document.addEventListener('mousewheel', onMouseWheel);
-	document.addEventListener('mousemove', onMouseMove);
+	document.addEventListener('mousemove', onMouseMove(corpo));
 	document.addEventListener('mousedown', onMouseClick);
 	document.addEventListener('mouseup', onMouseUp);
 
@@ -156,7 +153,7 @@ var onMouseMove = function(e){
 							0,
 							'XYZ')
 		);
-		corpo.personagem["tronco"].quaternion.multiplyQuaternions(angulosQuaternion, corpo.personagem["tronco"].quaternion);
+		corpo.puppet["tronco"].quaternion.multiplyQuaternions(angulosQuaternion, corpo.puppet["tronco"].quaternion);
 	}
 	mousePosAnterior = {
 		x: e.offsetX,
@@ -174,9 +171,9 @@ var onMouseUp = function(e){
 
 var onMouseWheel = function (e){
 	//for (let el in elementos){
-		corpo.personagem["tronco"].scale.x += (e.deltaY > 0)?-0.1:0.1;
-		corpo.personagem["tronco"].scale.y += (e.deltaY > 0)?-0.1:0.1;
-		corpo.personagem["tronco"].scale.z += (e.deltaY > 0)?-0.1:0.1;
+		corpo.puppet["tronco"].scale.x += (e.deltaY > 0)?-0.1:0.1;
+		corpo.puppet["tronco"].scale.y += (e.deltaY > 0)?-0.1:0.1;
+		corpo.puppet["tronco"].scale.z += (e.deltaY > 0)?-0.1:0.1;
 }
 
 var key_r = false;
@@ -217,19 +214,19 @@ var animation = function (){
 	requestAnimationFrame(animation); //adiciona o método na fila de renderização
 
 	if (key_space){ //movimento frente
-		if (corpo.persomagem["p_ombro_direito"].rotation.x < -2.83 || corpo.personagem["p_ombro_direito"].rotation.x > 1.3)
+		if (corpo.persomagem["p_ombro_direito"].rotation.x < -2.83 || corpo.puppet["p_ombro_direito"].rotation.x > 1.3)
 			velocidadeOmbroDireitoC*=-1;
 
-		corpo.personagem["p_ombro_direito"].rotation.x += velocidadeOmbroDireitoC;
+		corpo.puppet["p_ombro_direito"].rotation.x += velocidadeOmbroDireitoC;
 	}
 	if (key_r){
-		if (corpo.personagem["p_ombro_direito"].rotation.z < 0 || corpo.personagem["p_ombro_direito"].rotation.z > 1.4)
+		if (corpo.puppet["p_ombro_direito"].rotation.z < 0 || corpo.puppet["p_ombro_direito"].rotation.z > 1.4)
 			velocidadeOmbroDireitoL*=-1;
 
-			corpo.personagem["p_ombro_direito"].rotation.z += velocidadeOmbroDireitoL;
+			corpo.puppet["p_ombro_direito"].rotation.z += velocidadeOmbroDireitoL;
 	}
 	if (key_q){
-		corpo.personagem["tronco"].rotation.y += 0.01;
+		corpo.puppet["tronco"].rotation.y += 0.01;
 	}
 	
 	renderer.render(scene, camera); //tira uma foto do estado e mostra na tela
