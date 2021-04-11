@@ -75,8 +75,8 @@ class Corpo {
 		// Pernas
 		this.junta_perna_direita = this.pernaD.criaJunta(1,32,32,this.white);
 		this.junta_perna_esquerda = this.pernaE.criaJunta(1,32,32,this.white);
-		this.perna_direita = this.pernaD.criaPerna(1,5,1, this.green);
-		this.perna_esquerda = this.pernaE.criaPerna(1,5,1,this.green);
+		this.perna_direita = this.pernaD.criaPerna(1,7,1, this.green);
+		this.perna_esquerda = this.pernaE.criaPerna(1,7,1,this.green);
 
 		// Pivos
 		this.p_ombro_direito = new THREE.Group();
@@ -114,6 +114,8 @@ class Corpo {
 		personagem["p_cutovelo_esquerdo"] = this.p_cutovelo_esquerdo;		
 		personagem["antebraco_direito"] = this.antebraco_direito;
 		personagem["antebraco_esquerdo"] = this.antebraco_esquerdo;
+		personagem["p_junta_perna_direita"] = this.p_junta_perna_direita;
+		personagem["p_junta_perna_esquerda"] = this.p_junta_perna_esquerda;
 
 		// Adiciona as partes do corpo para o tronco 
 		this.tronco.add(this.cabeca);
@@ -157,12 +159,12 @@ class Corpo {
 		this.antebraco_esquerdo.position.y -= 2;
 		// Juntas
 		this.junta_perna_direita.position.y = this.tronco.position.y - 4.3;
-		this.junta_perna_direita.position.x = this.tronco.position.x - 1.5;
+		this.junta_perna_direita.position.x = this.tronco.position.x + 1.5;
 		this.junta_perna_esquerda.position.y = this.tronco.position.y - 4.3;
-		this.junta_perna_esquerda.position.x = this.tronco.position.x + 1.5;
+		this.junta_perna_esquerda.position.x = this.tronco.position.x - 1.5;
 		// Pernas
-		this.perna_direita.position.y -= 2.5;
-		this.perna_esquerda.position.y -= 2.5;  
+		this.perna_direita.position.y -= 3;
+		this.perna_esquerda.position.y -= 3;  
 
 		return personagem;
 	}
@@ -175,9 +177,7 @@ var camera = new THREE.PerspectiveCamera(40, window.innerWidth/window.innerHeigh
 var renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
-var velocidadeOmbroDireitoC = -0.01;
-var velocidadeOmbroDireitoL = -0.01;
-
+var velocidade_movimento = 0.02
 // Mouse
 var mousePos = {
 	x: 0,
@@ -187,8 +187,29 @@ var click = false;
 
 // Teclas
 var teclas = {
-	key_q: false,
-	key_r: false,
+	// Movimento do braço direito
+	key_direcional_up: false, // 38
+	key_direcional_down: false, // 40
+	key_direcional_left: false, // 37
+	key_direcional_right: false, // 39
+	// Movimento do ante-braço direito
+	key_k: false, // 75
+	key_m: false, // 77
+	// Movimento do braço esquerdo
+	key_w: false, // 87
+	key_a: false, // 65
+	key_s: false, // 83
+	key_d: false, // 68
+	// Movimento do ante-braço esquerdo
+	key_z: false, // 90
+	key_q: false, // 49
+	// Movimento perna esquerda
+	key_f: false,
+	key_v: false,
+	// Movimento perna direita
+	key_g: false,
+	key_b: false,
+	// Gira corpo
 	key_space: false
 }
 
@@ -238,27 +259,43 @@ var onMouseWheel = function(e){
 
 // Eventos do teclado
 var botaoUp = function(e){
-	if (e.keyCode == 82){ //r
-		teclas.key_r = false;
-	}
-	if (e.keyCode == 32){ //espaço
-		teclas.key_space = false;
-	}
-	if (e.keyCode == 81){ //espaço
-		teclas.key_q = false;
-	}
+	e.keyCode ==  38? teclas.key_direcional_up = false : 0;
+	e.keyCode == 40? teclas.key_direcional_down = false : 0;
+	e.keyCode == 37? teclas.key_direcional_left = false : 0;
+	e.keyCode == 39? teclas.key_direcional_right = false : 0;
+	e.keyCode == 75? teclas.key_k = false : 0;
+	e.keyCode == 77? teclas.key_m = false : 0;
+	e.keyCode ==  87? teclas.key_w = false : 0;
+	e.keyCode == 65? teclas.key_a = false : 0;
+	e.keyCode == 83? teclas.key_s = false : 0;
+	e.keyCode == 68? teclas.key_d = false : 0;
+	e.keyCode == 90? teclas.key_z = false : 0;
+	e.keyCode == 81? teclas.key_q = false : 0;
+	e.keyCode == 32?  teclas.key_space = false : 0;
+	e.keyCode == 70?  teclas.key_f = false : 0;
+	e.keyCode == 86?  teclas.key_v = false : 0;
+	e.keyCode == 71?  teclas.key_g = false : 0;
+	e.keyCode == 66?  teclas.key_b = false : 0;
 }
 
 var botaoDown = function(e){
-	if (e.keyCode == 82){ //r
-		teclas.key_r = true;
-	}
-	if (e.keyCode == 32){ //espaço
-		teclas.key_space= true;
-	}
-	if (e.keyCode == 81){ //espaço
-		teclas.key_q = true;
-	}
+	e.keyCode == 38? teclas.key_direcional_up = true : 0;
+	e.keyCode == 40? teclas.key_direcional_down = true : 0;
+	e.keyCode == 37? teclas.key_direcional_left = true : 0;
+	e.keyCode == 39? teclas.key_direcional_right = true : 0;
+	e.keyCode == 75? teclas.key_k = true : 0;
+	e.keyCode == 77? teclas.key_m = true : 0;
+	e.keyCode == 87? teclas.key_w = true : 0;
+	e.keyCode == 65? teclas.key_a = true : 0;
+	e.keyCode == 83? teclas.key_s = true : 0;
+	e.keyCode == 68? teclas.key_d = true : 0;
+	e.keyCode == 90? teclas.key_z = true : 0;
+	e.keyCode == 81? teclas.key_q = true : 0;
+	e.keyCode == 32?  teclas.key_space = true : 0;
+	e.keyCode == 70?  teclas.key_f = true : 0;
+	e.keyCode == 86?  teclas.key_v = true : 0;
+	e.keyCode == 71?  teclas.key_g = true : 0;
+	e.keyCode == 66?  teclas.key_b = true : 0;
 }
 
 /* 
@@ -267,20 +304,80 @@ var botaoDown = function(e){
 */
 function animation(){
 	requestAnimationFrame(animation); //adiciona o método na fila de renderização
-
-	if (teclas.key_space){ //movimento frente
-		if (corpo.puppet["p_ombro_direito"].rotation.x < -2.83 || corpo.puppet["p_ombro_direito"].rotation.x > 1.3)
-			velocidadeOmbroDireitoC*=-1;
-
-		corpo.puppet["p_ombro_direito"].rotation.x += velocidadeOmbroDireitoC;
+	// Braço direito
+	// Sube frente braço
+	if ( teclas.key_direcional_up && corpo.puppet["p_ombro_direito"].rotation.x > -2.83 ){ 
+		corpo.puppet["p_ombro_direito"].rotation.x -= velocidade_movimento;
+	}	
+	// Desce frente braço
+	if ( teclas.key_direcional_down && corpo.puppet["p_ombro_direito"].rotation.x < 1.3 ){
+		corpo.puppet["p_ombro_direito"].rotation.x += velocidade_movimento;
 	}
-	if (teclas.key_r){
-		if (corpo.puppet["p_ombro_direito"].rotation.z < 0 || corpo.puppet["p_ombro_direito"].rotation.z > 1.4)
-			velocidadeOmbroDireitoL*=-1;
-
-			corpo.puppet["p_ombro_direito"].rotation.z += velocidadeOmbroDireitoL;
+	// Sobe lateral braço
+	if ( teclas.key_direcional_left && corpo.puppet["p_ombro_direito"].rotation.z > 0 ){
+		corpo.puppet["p_ombro_direito"].rotation.z -= velocidade_movimento;
 	}
-	if (teclas.key_q){
+	// Sobe lateral braço
+	if ( teclas.key_direcional_right && corpo.puppet["p_ombro_direito"].rotation.z < 1.4 ){
+		corpo.puppet["p_ombro_direito"].rotation.z += velocidade_movimento;
+	}
+	// Sobe ante-braço
+	if ( teclas.key_k && corpo.puppet["p_cutovelo_direito"].rotation.x > -2.3 ){
+		corpo.puppet["p_cutovelo_direito"].rotation.x -= velocidade_movimento;
+	}
+	// Sobe ante-braço
+	if ( teclas.key_m && corpo.puppet["p_cutovelo_direito"].rotation.x < 0 ){
+		corpo.puppet["p_cutovelo_direito"].rotation.x += velocidade_movimento;
+	}
+
+	// Braço Esquerdo
+	// Sube frente braço
+	if ( teclas.key_w && corpo.puppet["p_ombro_esquerdo"].rotation.x > -2.83 ){ 
+		corpo.puppet["p_ombro_esquerdo"].rotation.x -= velocidade_movimento;
+	}	
+	// Desce frente braço
+	if ( teclas.key_s && corpo.puppet["p_ombro_esquerdo"].rotation.x < 1.3 ){
+		corpo.puppet["p_ombro_esquerdo"].rotation.x += velocidade_movimento;
+	}
+	// Sobe lateral braço
+	if ( teclas.key_a && corpo.puppet["p_ombro_esquerdo"].rotation.z > -1.3 ){
+		corpo.puppet["p_ombro_esquerdo"].rotation.z -= velocidade_movimento;
+	}
+	// Sobe lateral braço
+	if ( teclas.key_d && corpo.puppet["p_ombro_esquerdo"].rotation.z < 0 ){
+		corpo.puppet["p_ombro_esquerdo"].rotation.z += velocidade_movimento;
+	}
+	// Sobe ante-braço
+	if ( teclas.key_q && corpo.puppet["p_cutovelo_esquerdo"].rotation.x > -2.3 ){
+		corpo.puppet["p_cutovelo_esquerdo"].rotation.x -= velocidade_movimento;
+	}
+	// Sobe ante-braço
+	if ( teclas.key_z && corpo.puppet["p_cutovelo_esquerdo"].rotation.x < 0 ){
+		corpo.puppet["p_cutovelo_esquerdo"].rotation.x += velocidade_movimento;
+	}
+
+	// Perna Direita
+	// Frente
+	if ( teclas.key_g && corpo.puppet["p_junta_perna_direita"].rotation.x > -1.1 ){
+		corpo.puppet["p_junta_perna_direita"].rotation.x -= velocidade_movimento;
+	}
+	// Atras
+	if ( teclas.key_b && corpo.puppet["p_junta_perna_direita"].rotation.x < 0.6 ){
+		corpo.puppet["p_junta_perna_direita"].rotation.x += velocidade_movimento;
+	}
+
+	// Perna Esquerda
+	// Frente
+	if ( teclas.key_f && corpo.puppet["p_junta_perna_esquerda"].rotation.x > -1.1 ){
+		corpo.puppet["p_junta_perna_esquerda"].rotation.x -= velocidade_movimento;
+	}
+	// Atras
+	if ( teclas.key_v && corpo.puppet["p_junta_perna_esquerda"].rotation.x < 0.6 ){
+		corpo.puppet["p_junta_perna_esquerda"].rotation.x += velocidade_movimento;
+	}
+
+	// Gira corpo
+	if (teclas.key_space){
 		corpo.puppet["tronco"].rotation.y += 0.01;
 	}
 	
