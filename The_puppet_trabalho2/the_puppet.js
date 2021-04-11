@@ -4,7 +4,6 @@ O nome do nosso personagem é Rodolfo
 
 // Partes do corpo
 class Braco{
-	// Sim, são funções repetidas, mas quero mantes organização por nomes
 	criaJunta(x,y,z,cor){
 		return new THREE.Mesh(new THREE.SphereGeometry(x,y,z), new THREE.MeshBasicMaterial({color: cor}));
 	}
@@ -92,8 +91,8 @@ class Corpo {
 	}
 
 	/*
-	@ name: Monta
-	@ Description: Gera o personagem
+	@ Nome: Montar
+	@ Descrição: Gera o personagem
 	*/
 	montar(){
 		// Adiciona as partes do corpo ao dicionario
@@ -169,52 +168,48 @@ class Corpo {
 	}
 }
 
-var scene;
-var camera;
-var renderer;
+// Variavei Globais
+var scene = new THREE.Scene();
+var camera = new THREE.PerspectiveCamera(40, window.innerWidth/window.innerHeight, 1, 150);
+
+var renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+var velocidadeOmbroDireitoC = -0.01;
+var velocidadeOmbroDireitoL = -0.01;
+
+// Mouse
+var mousePos = {
+	x: 0,
+	y: 0
+};
+var click = false;
+
+// Teclas
+var teclas = {
+	key_q: false,
+	key_r: false,
+	key_space: false
+}
+
 // Instancia o nosso personagem
 const corpo = new Corpo();
 
-var init = function (){
-	scene = new THREE.Scene();
-	camera = new THREE.PerspectiveCamera(40, window.innerWidth/window.innerHeight, 1, 150);
-	
-	renderer = new THREE.WebGLRenderer();
-	renderer.setSize(window.innerWidth, window.innerHeight);
-	document.body.appendChild(renderer.domElement);
-	
-	camera.position.z = 80;
-	camera.position.x = 0;
-	camera.position.y = 2;
-	
-	// Carrega o corpo para ser renderizado
-	scene.add(corpo.tronco);
-	animation();
-
-	// Eventos do teclado
-	document.addEventListener('keydown', apertouButao);
-	document.addEventListener('keyup', soltouBotao);
-	
-	// Eventos do mouse
-	document.addEventListener('mousewheel', onMouseWheel);
-	document.addEventListener('mousemove', onMouseMove);
-	document.addEventListener('mousedown', onMouseClick);
-	document.addEventListener('mouseup', onMouseUp);
+// Funções necessarias
+// Função extra para a transformação do valore recebido para radianos
+var paraRadianos = function(angulo){
+	return angulo * (Math.PI/180);
 };
 
-var clicando = false;
-var mousePosAnterior = {
-	x:0,
-	y:0
-}
-
+// Eventos do mouse 
 var onMouseMove = function(e){
+	
 	let diferencaMovimento = {
-		x: e.offsetX - mousePosAnterior.x,
-		y: e.offsetY - mousePosAnterior.y
+		x: e.offsetX - mousePos.x,
+		y: e.offsetY - mousePos.y
 	}
-
-	if (clicando){
+	
+	if (click){
 
 		let angulosQuaternion = new THREE.Quaternion().setFromEuler(
 		new THREE.Euler (	paraRadianos(diferencaMovimento.y)*0.5,
@@ -224,85 +219,92 @@ var onMouseMove = function(e){
 		);
 		corpo.puppet["tronco"].quaternion.multiplyQuaternions(angulosQuaternion, corpo.puppet["tronco"].quaternion);
 	}
-	mousePosAnterior = {
+	mousePos = {
 		x: e.offsetX,
 		y: e.offsetY
 	}
-};
-
+}
 var onMouseClick = function(e){
-	clicando = true;
+	click = true;
 };
-
-var onMouseUp = function(e){
-	clicando = false;
+var onMouseUnclick = function(e){
+	click = false;
 };
-
-var onMouseWheel = function (e){
-	//for (let el in elementos){
-		corpo.puppet["tronco"].scale.x += (e.deltaY > 0)?-0.1:0.1;
-		corpo.puppet["tronco"].scale.y += (e.deltaY > 0)?-0.1:0.1;
-		corpo.puppet["tronco"].scale.z += (e.deltaY > 0)?-0.1:0.1;
+var onMouseWheel = function(e){
+	corpo.puppet["tronco"].scale.x += (e.deltaY > 0)? -0.1 : 0.1;
+	corpo.puppet["tronco"].scale.y += (e.deltaY > 0)? -0.1 : 0.1;
+	corpo.puppet["tronco"].scale.z += (e.deltaY > 0)? -0.1 : 0.1;
 }
 
-var key_r = false;
-var key_space = false;
-var key_q = false;
-
-var soltouBotao = function(e){
-
+// Eventos do teclado
+var botaoUp = function(e){
 	if (e.keyCode == 82){ //r
-		key_r = false;
+		teclas.key_r = false;
 	}
 	if (e.keyCode == 32){ //espaço
-		key_space = false;
+		teclas.key_space = false;
 	}
 	if (e.keyCode == 81){ //espaço
-		key_q = false;
+		teclas.key_q = false;
 	}
 }
 
-
-var apertouButao =  function(e){
-
+var botaoDown = function(e){
 	if (e.keyCode == 82){ //r
-		key_r = true;
+		teclas.key_r = true;
 	}
-	if (e.keyCode == 32){ // space
-		key_space = true;
+	if (e.keyCode == 32){ //espaço
+		teclas.key_space= true;
 	}
-
-	if (e.keyCode == 81){ // q
-		key_q = true;		
+	if (e.keyCode == 81){ //espaço
+		teclas.key_q = true;
 	}
 }
 
-var velocidadeOmbroDireitoC = -0.01;
-var velocidadeOmbroDireitoL = -0.01;
-var animation = function (){
+/* 
+@ Nome: animation
+@ Descrição: Responsavel pela animação do personagem
+*/
+function animation(){
 	requestAnimationFrame(animation); //adiciona o método na fila de renderização
 
-	if (key_space){ //movimento frente
+	if (teclas.key_space){ //movimento frente
 		if (corpo.puppet["p_ombro_direito"].rotation.x < -2.83 || corpo.puppet["p_ombro_direito"].rotation.x > 1.3)
 			velocidadeOmbroDireitoC*=-1;
 
 		corpo.puppet["p_ombro_direito"].rotation.x += velocidadeOmbroDireitoC;
 	}
-	if (key_r){
+	if (teclas.key_r){
 		if (corpo.puppet["p_ombro_direito"].rotation.z < 0 || corpo.puppet["p_ombro_direito"].rotation.z > 1.4)
 			velocidadeOmbroDireitoL*=-1;
 
 			corpo.puppet["p_ombro_direito"].rotation.z += velocidadeOmbroDireitoL;
 	}
-	if (key_q){
+	if (teclas.key_q){
 		corpo.puppet["tronco"].rotation.y += 0.01;
 	}
 	
 	renderer.render(scene, camera); //tira uma foto do estado e mostra na tela
 }
 
-function paraRadianos(angulo){
-	return angulo * (Math.PI/180);
-}
+function init(){	
+	camera.position.z = 80;
+	camera.position.x = 0;
+	camera.position.y = 2;
+
+	// Carrega o corpo para ser renderizado
+	scene.add(corpo.tronco);
+	animation();
+
+	// Eventos do teclado
+	document.addEventListener('keydown', botaoDown);
+	document.addEventListener('keyup', botaoUp);
+	
+	// Eventos do mouse
+	document.addEventListener('mousewheel', onMouseWheel);
+	document.addEventListener('mousemove', onMouseMove);
+	document.addEventListener('mousedown', onMouseClick);
+	document.addEventListener('mouseup', onMouseUnclick);
+};
 
 window.onload = this.init
