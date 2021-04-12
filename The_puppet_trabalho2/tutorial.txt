@@ -18,7 +18,3 @@ Movimentos perna esquerda:
 
 Movimento Giro corpo:
     -> Teclas: Espaço
-    
-Movimentos pré-definidos:
--> Andar => andar(velocidade) ... exemplo: andar(0.01)
-# Você pode digitar a opção "andar(velocidade)" no console para ter a animação do Rodolfo andando

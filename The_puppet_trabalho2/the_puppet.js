@@ -178,6 +178,7 @@ var renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 var velocidade_movimento = 0.02
+var funcaoParar = true;
 // Mouse
 var mousePos = {
 	x: 0,
@@ -215,18 +216,6 @@ var teclas = {
 
 // Instancia o nosso personagem
 const corpo = new Corpo();
-
-// Funções de animação pré-difinidas
-function andar(velocidade = 0.01){
-	var deslocando =  velocidade <= 0.2? "andando" : "correndo";
-	console.log("Para parar a função clique em qualquer tecla...\nRodolvo esta " + deslocando);
-	var continuar = true;
-
-	// while (continuar){
-		
-	// }
-}
-
 
 // Funções necessarias
 // Função extra para a transformação do valore recebido para radianos
@@ -325,7 +314,7 @@ function animation(){
 	if ( teclas.key_direcional_down && corpo.puppet["p_ombro_direito"].rotation.x < 1.3 ){
 		corpo.puppet["p_ombro_direito"].rotation.x += velocidade_movimento;
 	}
-	// Sobe lateral braço
+	// Desce lateral braço
 	if ( teclas.key_direcional_left && corpo.puppet["p_ombro_direito"].rotation.z > 0 ){
 		corpo.puppet["p_ombro_direito"].rotation.z -= velocidade_movimento;
 	}
@@ -337,7 +326,7 @@ function animation(){
 	if ( teclas.key_k && corpo.puppet["p_cutovelo_direito"].rotation.x > -2.3 ){
 		corpo.puppet["p_cutovelo_direito"].rotation.x -= velocidade_movimento;
 	}
-	// Sobe ante-braço
+	// Desce ante-braço
 	if ( teclas.key_m && corpo.puppet["p_cutovelo_direito"].rotation.x < 0 ){
 		corpo.puppet["p_cutovelo_direito"].rotation.x += velocidade_movimento;
 	}
@@ -351,7 +340,7 @@ function animation(){
 	if ( teclas.key_s && corpo.puppet["p_ombro_esquerdo"].rotation.x < 1.3 ){
 		corpo.puppet["p_ombro_esquerdo"].rotation.x += velocidade_movimento;
 	}
-	// Sobe lateral braço
+	// Desce lateral braço
 	if ( teclas.key_a && corpo.puppet["p_ombro_esquerdo"].rotation.z > -1.3 ){
 		corpo.puppet["p_ombro_esquerdo"].rotation.z -= velocidade_movimento;
 	}
@@ -363,7 +352,7 @@ function animation(){
 	if ( teclas.key_q && corpo.puppet["p_cutovelo_esquerdo"].rotation.x > -2.3 ){
 		corpo.puppet["p_cutovelo_esquerdo"].rotation.x -= velocidade_movimento;
 	}
-	// Sobe ante-braço
+	// Desce ante-braço
 	if ( teclas.key_z && corpo.puppet["p_cutovelo_esquerdo"].rotation.x < 0 ){
 		corpo.puppet["p_cutovelo_esquerdo"].rotation.x += velocidade_movimento;
 	}
