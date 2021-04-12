@@ -216,6 +216,18 @@ var teclas = {
 // Instancia o nosso personagem
 const corpo = new Corpo();
 
+// Funções de animação pré-difinidas
+function andar(velocidade = 0.01){
+	var deslocando =  velocidade <= 0.2? "andando" : "correndo";
+	console.log("Para parar a função clique em qualquer tecla...\nRodolvo esta " + deslocando);
+	var continuar = true;
+
+	// while (continuar){
+		
+	// }
+}
+
+
 // Funções necessarias
 // Função extra para a transformação do valore recebido para radianos
 var paraRadianos = function(angulo){

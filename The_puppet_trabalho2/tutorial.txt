@@ -1,0 +1,24 @@
+Bem vindo ao tutorial do emulador do Rodolfo...
+
+Movimentos braço direito:
+    -> Direcionais > up, down, left, right
+    Movimento ante-braço direito:
+        -> K, M
+
+Movimentos braço esquerdo:
+    -> Teclas > W, A, S, D
+    Movimento ante-braço esquerdo:
+        -> Q, Z
+
+Movimentos perna direita:
+    -> Teclas: G, B
+
+Movimentos perna esquerda:
+    -> Teclas: F, V
+
+Movimento Giro corpo:
+    -> Teclas: Espaço
+    
+Movimentos pré-definidos:
+-> Andar => andar(velocidade) ... exemplo: andar(0.01)
+# Você pode digitar a opção "andar(velocidade)" no console para ter a animação do Rodolfo andando
