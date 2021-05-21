@@ -50,6 +50,7 @@ var loaderMan = function(){
 
             var action = mixer.clipAction( object.animations[ 0 ] );
             var clip = action.getClip();
+            action._clip.duration = 13.5;
             action.setLoop(THREE.Loop);
             action.enable = true
             action.play();
